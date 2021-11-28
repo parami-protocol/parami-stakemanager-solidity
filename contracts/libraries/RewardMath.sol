@@ -19,7 +19,7 @@ library RewardMath {
     ) internal view returns (uint256 reward, uint160 secondsInsideX128) {
         assert(block.timestamp >= startTime);
         assert(endTime > startTime);
-        assert(endTime - startTime <= 5184000);
+        assert(endTime - startTime <= 5184000);//TODO: remove hardcoded value
 
         secondsInsideX128 = uint160(
             SafeMath.mul(
