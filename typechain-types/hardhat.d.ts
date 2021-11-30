@@ -37,10 +37,6 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IERC721Receiver__factory>;
     getContractFactory(
-      name: "IUniswapV3MintCallback",
-      signerOrOptions?: ethers.Signer | FactoryOptions
-    ): Promise<Contracts.IUniswapV3MintCallback__factory>;
-    getContractFactory(
       name: "IUniswapV3Factory",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.IUniswapV3Factory__factory>;
@@ -143,11 +139,6 @@ declare module "hardhat/types/runtime" {
       address: string,
       signer?: ethers.Signer
     ): Promise<Contracts.IERC721Receiver>;
-    getContractAt(
-      name: "IUniswapV3MintCallback",
-      address: string,
-      signer?: ethers.Signer
-    ): Promise<Contracts.IUniswapV3MintCallback>;
     getContractAt(
       name: "IUniswapV3Factory",
       address: string,
