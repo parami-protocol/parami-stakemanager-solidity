@@ -1,0 +1,47 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "command": "yarn test",
+            "name": "Run yarn start",
+            "request": "launch",
+            "type": "node-terminal",
+            "env": {
+                "INFURA_API_KEY":"2c1781167b104bbf8766a67881984394",
+                "PRIVATE_KEY":"a6eb152cc770f184a434cfc3c60f95d53d808bae554d27d971a2c9fb29651c1e",
+                "ETHERSCAN_API_KEY":"GYE9F2AX6IB4QV5EV9AWDVWDSXFDQ5U727"
+            }
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "hardhat test",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "runtimeExecutable": "${workspaceFolder}/packages/hardhat/node_modules/.bin/hardhat.cmd",
+            "args": [
+                "test",
+                "--network",
+                "localhost"
+            ],
+            "cwd": "${workspaceFolder}/packages/hardhat"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "hardhat new byot garden",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "runtimeExecutable": "${workspaceFolder}/packages/hardhat/node_modules/.bin/hardhat",
+            "args": [
+                "run",
+                "./scripts/new-byot-garden.ts",
+                "--network",
+                "rinkeby"
+            ],
+            "cwd": "${workspaceFolder}/packages/hardhat"
+        }
+    ]
+}

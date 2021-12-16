@@ -54,7 +54,7 @@ describe('unittest/StakeAndWithdraw', () => {
     let rewardToken: string;
     let pool01: string;
     let incentiveKey: any;
-    let incentiveId;
+    let incentiveId: any;
 
     before('loader', async () => {
         loadFixture = createFixtureLoader(provider.getWallets(), provider)

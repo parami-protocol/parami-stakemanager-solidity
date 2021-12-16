@@ -10,3 +10,4 @@ artifacts
 .DS_Store
 .env.ps1
 yarn-error.log
+.openzeppelin/
