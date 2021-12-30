@@ -13,8 +13,8 @@ import {
     TestERC20,
     INonfungiblePositionManager,
     IUniswapV3Pool,
-} from "../../typechain";
-import { ISwapRouter } from '../../types/ISwapRouter'
+    ISwapRouter
+} from "../../typechain-types";
 
 
 //export class StakerHelper {

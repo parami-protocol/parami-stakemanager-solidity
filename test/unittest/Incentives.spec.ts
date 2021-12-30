@@ -24,7 +24,7 @@ import {
     Ad3StakeManager,
     TestIncentiveId,
     TestERC20
-} from "../../typechain";
+} from "../../typechain-types";
 
 type LoadFixtureFunction = ReturnType<typeof createFixtureLoader>;
 let loadFixture: LoadFixtureFunction;
