@@ -25,7 +25,7 @@ import {
     Ad3StakeManager,
     TestIncentiveId,
     TestERC20
-} from "../../typechain";
+} from "../../typechain-types";
 
 type LoadFixtureFunction = ReturnType<typeof createFixtureLoader>;
 let loadFixture: LoadFixtureFunction;
@@ -220,17 +220,6 @@ describe('unittest/StakeAndWithdraw', () => {
             await timeMachine.set(incentiveKey.endTime + 1);
             await context.staker.connect(gov).cancelIncentive(incentiveKey, lpUser1.address);
             const { reward } = await context.staker.connect(lpUser0).getAccruedRewardInfo(incentiveKey, tokenId);
-            expect(reward).to.eq(0);
-        });
-
-        it('returns 0 when incentive not exist', async() => {
-            let incentiveKeyInner = {
-                rewardToken: rewardToken,
-                pool: pool01,
-                startTime: 1,
-                endTime: 2
-            };
-            const { reward } = await context.staker.connect(lpUser0).getAccruedRewardInfo(incentiveKeyInner, tokenId);
             expect(reward).to.eq(0);
         })
     });

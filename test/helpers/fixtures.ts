@@ -15,16 +15,16 @@ import {
     INonfungiblePositionManager,
     IUniswapV3Factory,
     IUniswapV3Pool,
-    TestIncentiveId
-} from '../../typechain';
+    TestIncentiveId,
+    IWETH9,
+    ISwapRouter,
+    NFTDescriptor
+} from '../../typechain-types';
 import { linkLibraries } from './linkLibraries';
 import { FeeAmount, MAX_GAS_LIMIT, encodePriceSqrt } from './constants';
 import { AccountFixture } from './accounts';
 
-import WETH9 from '../../types/WETH9.json';
-import { IWETH9 } from '../../types/IWETH9';
-import { ISwapRouter } from '../../types/ISwapRouter'
-import { NFTDescriptor } from '../../types/NFTDescriptor'
+import WETH9 from '../abis/WETH9.json';
 
 type WETH9Fixture = { weth9: IWETH9 };
 
