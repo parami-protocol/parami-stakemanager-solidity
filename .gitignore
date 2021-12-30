@@ -1,0 +1,14 @@
+artifacts/
+cache/
+crytic-export/
+node_modules/
+typechain/
+*.code-workspace
+dist/
+.openzeppelin/
+.openzeppelin/*
+<<<<<<< HEAD
+yarn-error.log
+=======
+.idea/*
+>>>>>>> e7503a5 (ADD: test case for 'return 0 when incentive not exist')
