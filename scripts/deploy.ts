@@ -7,12 +7,17 @@ async function main() {
   // Deploying
   const factory = await ethers.getContractFactory("Ad3StakeManager");
   let contract = await upgrades.deployProxy(
-      factory, [Goverance, UniswapV3FactoryAddress, NFTAddress])
+    factory, [Goverance, UniswapV3FactoryAddress, NFTAddress])
 
   console.log(contract.address); // 0xB6987F36D4189eC1ab2A5dC1bf212B03f69BcFe3
   console.log(contract.deployTransaction.hash);
-  await contract.deployed();
+  const res = await contract.deployed();
+  console.log(res.address);
   //await contract.setGoverance(Frontend);
+
+  // // Upgrading
+  // const BoxV2 = await ethers.getContractFactory("BoxV2");
+  // const upgraded = await upgrades.upgradeProxy(instance.address, BoxV2);
 }
 
 main();
