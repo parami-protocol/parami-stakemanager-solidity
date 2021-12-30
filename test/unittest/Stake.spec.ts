@@ -29,7 +29,7 @@ import {
 
 type LoadFixtureFunction = ReturnType<typeof createFixtureLoader>;
 let loadFixture: LoadFixtureFunction;
-
+const MONTH = 30 * 24 * 60 * 60;
 
 describe('unittest/StakeAndWithdraw', () => {
     const wallets = provider.getWallets();
@@ -66,7 +66,7 @@ describe('unittest/StakeAndWithdraw', () => {
         // setup IncentiveKey
         rewardToken = context.rewardToken.address
         pool01 = context.pool01;
-        const {startTime, endTime} = makeTimestamps(await blockTimestamp());
+        const { startTime, endTime } = makeTimestamps(await blockTimestamp());
         incentiveKey = {
             rewardToken: rewardToken,
             pool: pool01,
@@ -118,9 +118,9 @@ describe('unittest/StakeAndWithdraw', () => {
             const { liquidity } = await context.nft.positions(tokenId)
             await timeMachine.set(incentiveKey.startTime + 1);
             await expect(context.staker.connect(lpUser0).depositToken(
-                    incentiveKey,
-                    tokenId
-                ))
+                incentiveKey,
+                tokenId
+            ))
                 .to.emit(context.staker, 'TokenStaked')
                 .withArgs(incentiveId, tokenId, liquidity);
         });
@@ -132,8 +132,8 @@ describe('unittest/StakeAndWithdraw', () => {
             expect((await context.staker.stakes(incentiveId, tokenId)).secondsPerLiquidityInsideInitialX128).to.gt(0);
 
             await expect(context.staker.connect(lpUser0).unstakeToken(incentiveKey, tokenId, lpUser0.address))
-                    .to.emit(context.staker, 'TokenUnstaked')
-                    .withArgs(incentiveId, tokenId);
+                .to.emit(context.staker, 'TokenUnstaked')
+                .withArgs(incentiveId, tokenId);
             expect((await context.staker.deposits(tokenId)).numberOfStakes).to.eq(0);
             expect((await context.staker.stakes(incentiveId, tokenId)).secondsPerLiquidityInsideInitialX128).to.eq(0);
         });
@@ -161,39 +161,36 @@ describe('unittest/StakeAndWithdraw', () => {
             it('sender is not nft owner', async () => {
                 await timeMachine.set(incentiveKey.startTime + 1);
                 await expect(context.staker.connect(lpUser1).depositToken(
-                        incentiveKey,
-                        tokenId
-                    )).revertedWith('not approved');
+                    incentiveKey,
+                    tokenId
+                )).revertedWith('not approved');
             });
             it('incentive not started', async () => {
                 await expect(context.staker.connect(lpUser0).depositToken(
-                        incentiveKey,
-                        tokenId
-                    )).revertedWith('incentive not started');
+                    incentiveKey,
+                    tokenId
+                )).revertedWith('incentive not started');
             });
+            it('incentive duration(endTime - startTime) longer than 2 months', async () => {
+                const { startTime, endTime } = makeTimestamps(await blockTimestamp());
+                incentiveKey = {
+                    rewardToken: rewardToken,
+                    pool: pool01,
+                    startTime: startTime,
+                    endTime: startTime + 2 * MONTH + 10
+                };
+                incentiveId = await context.testIncentiveId.compute(incentiveKey);
+                await expect(context.staker.connect(gov).createIncentive(
+                    incentiveKey,
+                    totalReward,
+                    minTick,
+                    maxTick
+                ))
+                    .revertedWith('incentive duration is too long');
+            })
         });
     });
 
-    //describe('Withdraw', async () => {
-        //beforeEach(async () => {
-            //await timeMachine.set(incentiveKey.startTime + 1);
-            //await context.staker.connect(lpUser0).depositToken(incentiveKey, tokenId);
-        //});
-        //it('withdraw token', async () => {
-            //expect((await context.staker.deposits(tokenId)).numberOfStakes).to.eq(1);
-            //expect((await context.staker.stakes(incentiveId, tokenId)).secondsPerLiquidityInsideInitialX128).to.gt(0);
-
-            //await expect(context.staker.connect(lpUser0).unstakeToken(incentiveKey, tokenId))
-                    //.to.emit(context.staker, 'TokenUnstaked')
-                    //.withArgs(incentiveId, tokenId);
-            //expect((await context.staker.deposits(tokenId)).numberOfStakes).to.eq(0);
-            //expect((await context.staker.stakes(incentiveId, tokenId)).secondsPerLiquidityInsideInitialX128).to.eq(0);
-            //expect(await context.nft.ownerOf(tokenId)).to.eq(context.staker.address);
-
-            //await context.staker.connect(lpUser0).withdrawToken(tokenId, lpUser0.address);
-            //expect(await context.nft.ownerOf(tokenId)).to.eq(lpUser0.address);
-        //});
-    //});
 
     describe('getRewardAmount', async () => {
         beforeEach(async () => {
@@ -201,26 +198,25 @@ describe('unittest/StakeAndWithdraw', () => {
             await context.staker.connect(lpUser0).depositToken(incentiveKey, tokenId);
         });
 
-      it('returns correct rewardAmount and secondsInPeriodX128 for the position', async () => {
+        it('returns correct rewardAmount and secondsInPeriodX128 for the position', async () => {
             const stake = await context.staker.stakes(incentiveId, tokenId);
             await provider.send('evm_mine', [incentiveKey.startTime + 100])
 
-            const { reward, secondsInsideX128} = await context.staker.connect(lpUser0).getAccruedRewardInfo(incentiveKey, tokenId)
+            const { reward, secondsInsideX128 } = await context.staker.connect(lpUser0).getAccruedRewardInfo(incentiveKey, tokenId)
             const { tickLower, tickUpper } = await context.nft.positions(tokenId)
             const secondsPerLiquidityInsideX128 = (await context.pool.connect(lpUser0).snapshotCumulativesInside(tickLower, tickUpper))
-                                                    .secondsPerLiquidityInsideX128
+                .secondsPerLiquidityInsideX128
 
             const expectedSecondsInPeriod = secondsPerLiquidityInsideX128
-                    .sub(stake.secondsPerLiquidityInsideInitialX128)
-                    .mul(stake.liquidity);
+                .sub(stake.secondsPerLiquidityInsideInitialX128)
+                .mul(stake.liquidity);
             expect(secondsInsideX128).to.eq(expectedSecondsInPeriod);
         });
 
         it('returns 0 when cancel incentive', async () => {
             await timeMachine.set(incentiveKey.endTime + 1);
             await context.staker.connect(gov).cancelIncentive(incentiveKey, lpUser1.address);
-            const { reward } = await context.staker.connect(lpUser0).getAccruedRewardInfo(incentiveKey, tokenId);
-            expect(reward).to.eq(0);
+            await expect(context.staker.connect(lpUser0).getAccruedRewardInfo(incentiveKey, tokenId)).revertedWith('wrong IncentiveKey, non-existent incentive');
         })
     });
 
@@ -233,7 +229,7 @@ describe('unittest/StakeAndWithdraw', () => {
             //await context.staker.connect(lpUser0).unstakeToken(incentiveKey, tokenId);
         });
         it('emits RewardClaimed event', async () => {
-            const { reward, secondsInsideX128} = await context.staker.connect(lpUser0).getAccruedRewardInfo(incentiveKey, tokenId)
+            const { reward, secondsInsideX128 } = await context.staker.connect(lpUser0).getAccruedRewardInfo(incentiveKey, tokenId)
             await expect(context.staker.connect(lpUser0).claimReward(incentiveKey, tokenId, recipient, reward))
                 .to.emit(context.staker, 'RewardClaimed')
                 .withArgs(recipient, reward);
@@ -241,7 +237,7 @@ describe('unittest/StakeAndWithdraw', () => {
         it('transfer reward and check _rewards', async () => {
             const balance = await context.rewardToken.balanceOf(recipient);
             expect(await context.staker.rewards(rewardToken, recipient)).to.eq(0);
-            const { reward, secondsInsideX128} = await context.staker.connect(lpUser0).getAccruedRewardInfo(incentiveKey, tokenId)
+            const { reward, secondsInsideX128 } = await context.staker.connect(lpUser0).getAccruedRewardInfo(incentiveKey, tokenId)
             await expect(context.staker.connect(lpUser0).claimReward(incentiveKey, tokenId, recipient, reward))
                 .to.emit(context.staker, 'RewardClaimed')
                 .withArgs(recipient, reward);
