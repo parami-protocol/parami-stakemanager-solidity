@@ -80,13 +80,14 @@ contract Ad3StakeManager is IAd3StakeManager, ReentrancyGuardUpgradeable {
         gov = msg.sender;
         nextgov = address(0);
     }
+
     /** 
-    @title update the stake range of a incentive which is already created, require caller is governor
+    update the stake range of a incentive which is already created, require caller is governor
     @dev update minTick & maxTick of incentives[IncentiveId.compute(key)]
     @param key The IncentiveKey struct which defined in IAd3StakeManager
-    @param minTick The minimum tick allowed for staking in this new incentive
-    @param maxTick The maximum tick allowed for staking in this new incentive
-    @return no return, no event
+    @param tickLower The minimum tick allowed for staking in this new incentive
+    @param tickUpper The maximum tick allowed for staking in this new incentive
+    [return] no return, no event
     */
     function updateRange(
         IncentiveKey memory key,
@@ -133,13 +134,14 @@ contract Ad3StakeManager is IAd3StakeManager, ReentrancyGuardUpgradeable {
         require(index < _tokenIds.length(), "overflow tokenId set length");
         return _tokenIds.at(index);
     }
+
     /** 
-    @title query a stake by incentiveId and tokenId
+    query a stake by incentiveId and tokenId
     @notice query {owner, liquidity, secondsPerLiquidityInsideInitialX128, secondsPerLiquidityInsideAccruedX128 } of a stake by incentiveId and tokenId 
     @dev incentiveId = IncentiveId.compute(IncentiveKey)
     @param incentiveId The hash of the IncentiveKey
     @param tokenId The LP tokenId
-    @return {owner, liquidity, secondsPerLiquidityInsideInitialX128, secondsPerLiquidityInsideAccruedX128 }
+    [return] {owner, liquidity, secondsPerLiquidityInsideInitialX128, secondsPerLiquidityInsideAccruedX128 }
     */
     function stakes(bytes32 incentiveId, uint256 tokenId)
         public
@@ -162,18 +164,18 @@ contract Ad3StakeManager is IAd3StakeManager, ReentrancyGuardUpgradeable {
     }
 
     /** 
-    @title createIncentive creates a liquidity mining incentive program. The key used to look up an Incentive is the hash of its immutable properties.
+    createIncentive creates a liquidity mining incentive program. The key used to look up an Incentive is the hash of its immutable properties.
     @notice create a new incentive by governor, 
-        @require block.timestamp < key.startTime < key.endTime < (key.startTime + 2 months)
-        @require Incentive with this ID(hash(Key)) does not already exist.
-        @interaction transfer msg.sender to self
-        @interaction Sets incentives[key] = Incentive(totalRewardUnclaimed=totalReward, totalSecondsClaimedX128=0, rewardToken=rewardToken)
-        @interaction emit IncentiveCreated
+        [require] block.timestamp < key.startTime < key.endTime < (key.startTime + 2 months)
+        [require] Incentive with this ID(hash(Key)) does not already exist.
+        [interaction] transfer msg.sender to self
+        [interaction] Sets incentives[key] = Incentive(totalRewardUnclaimed=totalReward, totalSecondsClaimedX128=0, rewardToken=rewardToken)
+        [interaction] emit IncentiveCreated
     @param key The IncentiveKey struct which defined in IAd3StakeManager
     @param reward The total reward amount of this new incentive
     @param minTick The minimum tick allowed for staking in this new incentive
     @param maxTick The maximum tick allowed for staking in this new incentive
-    @return no return but emit IncentiveCreated
+    [return] no return but emit IncentiveCreated
     */
     function createIncentive(
         IncentiveKey memory key,
@@ -190,7 +192,10 @@ contract Ad3StakeManager is IAd3StakeManager, ReentrancyGuardUpgradeable {
             key.startTime < key.endTime,
             "start time must be before end time"
         );
-
+        require(
+            key.endTime - key.startTime <= 2 * 30 * 24 * 60 * 60,
+            "incentive duration is too long"
+        ); //TODO: remove hardcoded value
         bytes32 incentiveId = IncentiveId.compute(key);
         require(
             incentives[incentiveId].totalRewardUnclaimed == 0,
@@ -221,19 +226,18 @@ contract Ad3StakeManager is IAd3StakeManager, ReentrancyGuardUpgradeable {
             reward
         );
     }
+
     /** 
-    @title cancelIncentive cancel a liquidity mining incentive program. The key used to look up an Incentive is the hash of its immutable properties.
+    cancelIncentive cancel a liquidity mining incentive program. The key used to look up an Incentive is the hash of its immutable properties.
     @notice cancel a incentive that already exists by governor, the unclaimed reward of this incentive will be returned to the refundee(an address)
-        @require rewardUnclaimed > 0
-        @require  block.timestamp > incentive.endTime, which means the incentive is already expired
-        @interaction incentives[incentiveId].totalRewardUnclaimed = 0;
-        @interaction Transfer(key.rewardToken, refundee, rewardUnclaimed);
-        @interaction emit IncentiveCancelled
+        [require] rewardUnclaimed > 0
+        [require]  block.timestamp > incentive.endTime, which means the incentive is already expired
+        [interaction] incentives[incentiveId].totalRewardUnclaimed = 0;
+        [interaction] Transfer(key.rewardToken, refundee, rewardUnclaimed);
+        [interaction] emit IncentiveCancelled
     @param key The IncentiveKey struct which defined in IAd3StakeManager
-    @param reward The total reward amount of this new incentive
-    @param minTick The minimum tick allowed for staking in this new incentive
-    @param maxTick The maximum tick allowed for staking in this new incentive
-    @return no return but emit IncentiveCanceled(incentiveId, rewardUnclaimed);
+    @param refundee The refundee address
+    [return] no return but emit IncentiveCanceled(incentiveId, rewardUnclaimed);
     */
     function cancelIncentive(IncentiveKey memory key, address refundee)
         external
@@ -303,6 +307,9 @@ contract Ad3StakeManager is IAd3StakeManager, ReentrancyGuardUpgradeable {
         override
         isAuthorizedForToken(tokenId)
     {
+        require(block.timestamp >= key.startTime, "incentive not started");
+        require(block.timestamp <= key.endTime, "incentive has ended");
+
         nonfungiblePositionManager.safeTransferFrom(
             msg.sender,
             address(this),
@@ -486,8 +493,15 @@ contract Ad3StakeManager is IAd3StakeManager, ReentrancyGuardUpgradeable {
         ) = stakes(incentiveId, tokenId);
 
         Incentive storage incentive = incentives[incentiveId];
+        require(
+            incentive.totalRewardUnclaimed > 0,
+            "wrong IncentiveKey, non-existent incentive"
+        );
         Deposit storage deposit = deposits[tokenId];
-
+        require(
+            deposit.owner != address(0),
+            "wrong tokenId, non-existent deposit"
+        );
         (, secondsPerLiquidityInsideX128, ) = key
             .pool
             .snapshotCumulativesInside(deposit.tickLower, deposit.tickUpper);

@@ -11,3 +11,5 @@ artifacts
 .env.ps1
 yarn-error.log
 .openzeppelin/
+.vscode/
+soljson-*.js
