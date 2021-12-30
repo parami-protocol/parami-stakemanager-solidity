@@ -1,187 +1,46 @@
-AD3StakeMangager: https://rinkeby.etherscan.io/address/0x676f430587be833DB073a3268154B59c7F7ba6fe#code
-OldAD3StakeMangager: https://rinkeby.etherscan.io/address/0xbe754c2aeb20b35ea1705fe53dde9a2f4313cb3b#code
-TransparentUpgradeProxy: https://rinkeby.etherscan.io/address/0x18cC8771066450751b8816CEdC10E1889cFcD9c0#code
-ProxyAdmin: 
-UniswapV3FactoryAddress: https://rinkeby.etherscan.io/address/0x1F98431c8aD98523631AE4a59f267346ea31F984#code
-NonfungiblePositionManager: https://rinkeby.etherscan.io/address/0xC36442b4a4522E871399CD717aBDD847Ab11FE88#code
-# IAd3StakerManager ABI
+# Advanced Sample Hardhat Project
 
-## Structs
+This project demonstrates an advanced Hardhat use case, integrating other tools commonly used alongside Hardhat in the ecosystem.
 
-### IncentiveKey
+The project comes with a sample contract, a test for that contract, a sample script that deploys that contract, and an example of a task implementation, which simply lists the available accounts. It also comes with a variety of other tools, preconfigured to work with the project code.
 
-```
-struct IncentiveKey {
-    IERC20 rewardToken;
-    IUniswapV3Pool pool;
-    uint256 startTime;
-    uint256 endTime;
-}
-```
+Try running some of the following tasks:
 
-* rewardToken: AD3 address
-* IUniswapV3Pool: AD3/USDC-0.3% address etc.
-* startTime: Minting startTime
-* endTime: Minting endTime
-
-### Stake
-
-```
-struct Stake {
-    uint160 secondsPerLiquidityInsideInitialX128;
-    uint128 liquidity;
-    address owner;
-}
+```shell
+npx hardhat accounts
+npx hardhat compile
+npx hardhat clean
+npx hardhat test
+npx hardhat node
+npx hardhat help
+REPORT_GAS=true npx hardhat test
+npx hardhat coverage
+npx hardhat run scripts/deploy.ts
+TS_NODE_FILES=true npx ts-node scripts/deploy.ts
+npx eslint '**/*.{js,ts}'
+npx eslint '**/*.{js,ts}' --fix
+npx prettier '**/*.{json,sol,md}' --check
+npx prettier '**/*.{json,sol,md}' --write
+npx solhint 'contracts/**/*.sol'
+npx solhint 'contracts/**/*.sol' --fix
 ```
 
-* secondsPerLiquidityInsideInitialX128: LP provider liquidity seconds
-* liquidity: LP provider get liquidity number
-* owner: LP owner
+# Etherscan verification
 
+To try out Etherscan verification, you first need to deploy a contract to an Ethereum network that's supported by Etherscan, such as Ropsten.
 
-### Incentive
+In this project, copy the .env.example file to a file named .env, and then edit it to fill in the details. Enter your Etherscan API key, your Ropsten node URL (eg from Alchemy), and the private key of the account which will send the deployment transaction. With a valid .env file in place, first deploy your contract:
 
-```
-struct Incentive {
-    uint256 totalRewardUnclaimed;
-    uint160 totalSecondsClaimedX128;
-    int24 minTick;
-    int24 maxTick;
-}
+```shell
+hardhat run --network ropsten scripts/sample-script.ts
 ```
 
-* totalRewardUnclaimed: AD3 totalSupply for this pool
-* totalSecondsClaimedX128: AD3 total seconds when user claimed
-* minTick & maxTick: Price range to tick
+Then, copy the deployment address and paste it in to replace `DEPLOYED_CONTRACT_ADDRESS` in this command:
 
-## Interfaces
-
-### createIncentive
-
-```
-function createIncentive(
-    IncentiveKey memory key,
-    uint256 reward,
-    int24 minTick,
-    int24 maxTick
-) external;
+```shell
+npx hardhat verify --network ropsten DEPLOYED_CONTRACT_ADDRESS "Hello, Hardhat!"
 ```
 
-Only owner can create a incentive structure.
+# Performance optimizations
 
-### cancelIncentive
-
-```
-function cancelIncentive(IncentiveKey memory key, address recipient) external;
-```
-
-key: IncentiveKey which use to createIncentive
-recipient: send rest of AD3 to this address
-
-### depositToken
-
-```
-function depositToken(IncentiveKey memory key, uint256 tokenId) external;
-```
-
-Approved user deposit and stake NFT LP to this function
-
-key: IncentiveKey which use to createIncentive
-tokenId: user NFT lp tokenId
-
-### unstakeToken
-
-```
-function unstakeToken(IncentiveKey memory key, uint256 tokenId) external;
-```
-
-User unstake NFT LP to this function
-
-key: IncentiveKey which use to createIncentive
-tokenId: user NFT lp tokenId
-
-### withdrawToken
-
-```
-function withdrawToken(uint256 tokenId, address to) external;
-```
-
-User withdraw NFT LP to `to` address
-
-tokenId: user NFT lp tokenId
-to: address which transfer to
-
-### claimReward
-
-```
-function claimReward(address rewardToken, address recipient, uint256 amountRequested) external;
-```
-
-claimReward to recipient address
-
-rewardToken: AD3 token address
-recipient: receive AD3 address
-amountRequested: cliam amount
-
-
-### getAccruedRewardInfo
-
-```
-function getAccruedRewardInfo(IncentiveKey memory key, uint256 tokenId)
-    external view returns (uint256, uint160, u160);
-```
-
-get reward information, if flag is True, get accrued reward, otherwise get reward since last claim.
-
-key: IncentiveKey
-tokenId: user tokenId
-
-returns
-uint256 reward: reward amount
-uint160 seconds stakeing
-uint160 seconds stakeing per liquidity
-
-
-### getUserTokenCount
-
-```
-    function getUserTokenCount(address to) external view returns (uint256 index);
-```
-
-get user Token count
-
-
-### getTokenId
-
-```
-function getTokenId(address to, uint256 index) external view returns (uint256 tokenId);
-```
-
-get user TokenId with index
-
-### getTokenCount
-
-```
-    function getTokenCount() external view returns (uint256 index);
-```
-
-get TokenId count
-
-
-### getTokenId
-
-```
-function getTokenId(uint256 index) external view returns (uint256 tokenId);
-```
-
-get tokenId with index
-
-
-## APY calculate
-
-1. getTokenCount
-2. get all tokenId
-3. getAccruedRewardInfo(key, tokenId) -> (reward, secondsInsideX128, secondsPerLiquidityInsideX128)
-4. sum all rewards -> sumRewards
-5. diffSumRewards = (afterSumRewards - beforeSumRewards), interval maybe 15min = 15 * 60 = 900seconds, or a day
-4. APY = priceOfRewardToken * diffSumReward / interval * [ day ] * [ year ] / key.totalUnClaimRewards
+For faster runs of your tests and scripts, consider skipping ts-node's type checking by setting the environment variable `TS_NODE_TRANSPILE_ONLY` to `1` in hardhat's environment. For more details see [the documentation](https://hardhat.org/guides/typescript.html#performance-optimizations).

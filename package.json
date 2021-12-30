@@ -1,74 +1,36 @@
 {
-  "name": "@ad3staker/stakemanager",
-  "description": "Liquidity manager",
-  "license": "MIT",
+  "name": "stakerdeploy",
   "version": "1.0.0",
-  "keywords": [
-    "uniswap",
-    "liquidity mining",
-    "v3"
-  ],
-  "files": [
-    "contracts/interfaces",
-    "contracts/libraries",
-    "artifacts/contracts/**/*.json",
-    "!artifacts/contracts/**/*.dbg.json",
-    "!artifacts/contracts/test/**/*",
-    "!artifacts/contracts/base/**/*"
-  ],
-  "engines": {
-    "node": ">=10"
-  },
-  "dependencies": {
-    "@openzeppelin/contracts": "3.4.1-solc-0.7-2",
-    "@openzeppelin/contracts-upgradeable": "3.4.1-solc-0.7-2",
-    "@uniswap/v3-core": "1.0.0",
-    "@uniswap/v3-periphery": "^1.0.1"
-  },
-  "devDependencies": {
-    "@nomiclabs/hardhat-ethers": "^2.0.2",
-    "@nomiclabs/hardhat-etherscan": "^2.1.3",
-    "@nomiclabs/hardhat-waffle": "^2.0.1",
-    "@nomiclabs/hardhat-web3": "^2.0.0",
-    "@openzeppelin/hardhat-upgrades": "^1.9.0",
-    "@typechain/ethers-v5": "^7.0.0",
-    "@typechain/hardhat": "^2.0.1",
-    "@types/chai": "^4.2.6",
-    "@types/console-log-level": "^1.4.0",
-    "@types/lodash": "^4.14.170",
-    "@types/mocha": "^5.2.7",
-    "@typescript-eslint/eslint-plugin": "^4.26.0",
-    "@typescript-eslint/parser": "^4.26.0",
-    "chai": "^4.2.0",
-    "console-log-level": "^1.4.1",
-    "eslint": "^7.28.0",
-    "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-unused-imports": "^1.1.1",
-    "ethereum-waffle": "^3.0.2",
-    "ethers": "^5.0.8",
-    "hardhat": "^2.2.0",
-    "hardhat-abi-exporter": "^2.2.1",
-    "hardhat-contract-sizer": "^2.0.3",
-    "lodash": "^4.17.21",
-    "mocha-chai-jest-snapshot": "^1.1.0",
-    "prettier": "^2.2.1",
-    "prettier-check": "^2.0.0",
-    "prettier-plugin-solidity": "^1.0.0-beta.10",
-    "solhint": "^3.2.1",
-    "solhint-plugin-prettier": "^0.0.5",
-    "ts-node": "^8.5.4",
-    "typechain": "^5.0.0",
-    "typescript": "^4.3.2",
-    "web3": "^1.6.1",
-    "@remix-project/remixd": "^0.5.3"
-  },
+  "description": "",
+  "main": "index.js",
   "scripts": {
     "compile": "hardhat compile",
     "lint": "eslint . --ext .ts",
     "prettier": "prettier --write 'contracts/**/*.sol'",
     "size-contracts": "hardhat compile && hardhat size-contracts",
     "test": "hardhat test",
-    "clear-cache": "rm -rf artifacts/ cache/ typechain/",
-    "deploy:rinkeby": "npx hardhat run --network rinkeby scripts/rinkeby/deploy-upgradeable.ts"
+    "clear-cache": "rm -rf artifacts/ cache/ typechain/"
+  },
+  "author": "Parami",
+  "license": "MIT",
+  "devDependencies": {
+    "@nomiclabs/hardhat-ethers": "^2.0.2",
+    "@openzeppelin/hardhat-upgrades": "^1.12.0",
+    "ethers": "^5.5.1",
+    "ts-node": "^10.4.0"
+  },
+  "dependencies": {
+    "@nomiclabs/hardhat-etherscan": "^2.1.8",
+    "@nomiclabs/hardhat-waffle": "^2.0.1",
+    "@openzeppelin/contracts": "3.4.1-solc-0.7-2",
+    "@openzeppelin/contracts-upgradeable": "3.4.1-solc-0.7-2",
+    "@typechain/ethers-v5": "^8.0.4",
+    "@typechain/hardhat": "^3.0.0",
+    "@uniswap/v3-core": "^1.0.0",
+    "@uniswap/v3-periphery": "^1.0.1",
+    "dotenv": "^10.0.0",
+    "hardhat": "^2.7.0",
+    "solidity-coverage": "^0.7.17",
+    "typescript": "^4.5.2"
   }
 }

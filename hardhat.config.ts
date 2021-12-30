@@ -1,64 +1,59 @@
-import '@typechain/hardhat'
-import '@nomiclabs/hardhat-ethers'
-import '@nomiclabs/hardhat-waffle'
-import '@nomiclabs/hardhat-etherscan'
-import 'hardhat-abi-exporter';
+import * as dotenv from "dotenv";
+
+import { HardhatUserConfig, task } from "hardhat/config";
 import "@nomiclabs/hardhat-etherscan";
-import 'hardhat-contract-sizer'
+import "@nomiclabs/hardhat-waffle";
+import "@typechain/hardhat";
 import '@openzeppelin/hardhat-upgrades';
+// import "hardhat-gas-reporter";
+import "solidity-coverage";
 
-import { HardhatUserConfig } from 'hardhat/config'
+dotenv.config();
 
-const DEFAULT_COMPILER_SETTINGS = {
-  version: '0.7.6',
-  settings: {
-    optimizer: {
-      enabled: true,
-      runs: 1_000_000,
-    },
-    metadata: {
-      bytecodeHash: 'none',
-    },
-  },
-}
+// This is a sample Hardhat task. To learn how to create your own go to
+// https://hardhat.org/guides/create-task.html
+// task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
+//   const accounts = await hre.ethers.getSigners();
+
+//   for (const account of accounts) {
+//     console.log(account.address);
+//   }
+// });
+
+// You need to export an object to set up your config
+// Go to https://hardhat.org/config/ to learn more
 
 const config: HardhatUserConfig = {
+  solidity: {
+    version: '0.7.6',
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 1_000_000,
+      },
+      metadata: {
+        bytecodeHash: 'none',
+      },
+    },
+  },
   networks: {
-    hardhat: {
-      allowUnlimitedContractSize: false,
-    },
-    mainnet: {
-      url: `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
-    },
     ropsten: {
-      url: `https://ropsten.infura.io/v3/${process.env.INFURA_API_KEY}`,
+      url: process.env.ROPSTEN_URL || "",
+      accounts:
+        process.env.PRIVATE_KEY !== undefined ? [process.env.PRIVATE_KEY] : [],
     },
     rinkeby: {
       url: `https://rinkeby.infura.io/v3/${process.env.INFURA_API_KEY}`,
       accounts: [`${process.env.PRIVATE_KEY}`, ],
-      gas: 2100000,
-      gasPrice: 8000000000
-    },
-    goerli: {
-      url: `https://goerli.infura.io/v3/${process.env.INFURA_API_KEY}`,
-    },
-    kovan: {
-      url: `https://kovan.infura.io/v3/${process.env.INFURA_API_KEY}`,
     },
   },
+  // gasReporter: {
+  //   enabled: process.env.REPORT_GAS !== undefined,
+  //   currency: "USD",
+  // },
   etherscan: {
-    // Your API key for Etherscan
-    // Obtain one at https://etherscan.io/
-    apiKey: 'GYE9F2AX6IB4QV5EV9AWDVWDSXFDQ5U727',
+    apiKey: process.env.ETHERSCAN_API_KEY,
   },
-  solidity: {
-    compilers: [DEFAULT_COMPILER_SETTINGS],
-  },
-  contractSizer: {
-    alphaSort: false,
-    disambiguatePaths: true,
-    runOnCompile: false,
-  },
-}
+};
 
-export default config
+export default config;

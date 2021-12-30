@@ -1,0 +1,255 @@
+{
+  "manifestVersion": "3.2",
+  "proxies": [],
+  "impls": {
+    "8ee196512792ec3a185a53a51aa858c3a2abd322769adde6b7b5b8f1e7b1e625": {
+      "address": "0xf027E3835a5B66F5FE3AbB29C037a22668d56DA2",
+      "txHash": "0xb6514006c025853ecf66cdd3d2edcc7f31f0563373dcc0915b58d35284d703ec",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:25"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol:30"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "_status",
+            "type": "t_uint256",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol:37"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol:67"
+          },
+          {
+            "contract": "Ad3StakeManager",
+            "label": "factory",
+            "type": "t_contract(IUniswapV3Factory)1652",
+            "src": "contracts/Ad3StakeManager.sol:30"
+          },
+          {
+            "contract": "Ad3StakeManager",
+            "label": "nonfungiblePositionManager",
+            "type": "t_contract(INonfungiblePositionManager)3063",
+            "src": "contracts/Ad3StakeManager.sol:31"
+          },
+          {
+            "contract": "Ad3StakeManager",
+            "label": "deposits",
+            "type": "t_mapping(t_uint256,t_struct(Deposit)5093_storage)",
+            "src": "contracts/Ad3StakeManager.sol:34"
+          },
+          {
+            "contract": "Ad3StakeManager",
+            "label": "_stakes",
+            "type": "t_mapping(t_bytes32,t_mapping(t_uint256,t_struct(Stake)5073_storage))",
+            "src": "contracts/Ad3StakeManager.sol:37"
+          },
+          {
+            "contract": "Ad3StakeManager",
+            "label": "rewards",
+            "type": "t_mapping(t_address,t_mapping(t_address,t_uint256))",
+            "src": "contracts/Ad3StakeManager.sol:40"
+          },
+          {
+            "contract": "Ad3StakeManager",
+            "label": "incentives",
+            "type": "t_mapping(t_bytes32,t_struct(Incentive)5084_storage)",
+            "src": "contracts/Ad3StakeManager.sol:43"
+          },
+          {
+            "contract": "Ad3StakeManager",
+            "label": "_userTokenIds",
+            "type": "t_mapping(t_address,t_struct(UintSet)1474_storage)",
+            "src": "contracts/Ad3StakeManager.sol:45"
+          },
+          {
+            "contract": "Ad3StakeManager",
+            "label": "_tokenIds",
+            "type": "t_struct(UintSet)1474_storage",
+            "src": "contracts/Ad3StakeManager.sol:46"
+          },
+          {
+            "contract": "Ad3StakeManager",
+            "label": "deployer",
+            "type": "t_address",
+            "src": "contracts/Ad3StakeManager.sol:48"
+          },
+          {
+            "contract": "Ad3StakeManager",
+            "label": "gov",
+            "type": "t_address",
+            "src": "contracts/Ad3StakeManager.sol:49"
+          },
+          {
+            "contract": "Ad3StakeManager",
+            "label": "nextgov",
+            "type": "t_address",
+            "src": "contracts/Ad3StakeManager.sol:50"
+          }
+        ],
+        "types": {
+          "t_contract(IUniswapV3Factory)1652": {
+            "label": "contract IUniswapV3Factory"
+          },
+          "t_contract(INonfungiblePositionManager)3063": {
+            "label": "contract INonfungiblePositionManager"
+          },
+          "t_mapping(t_uint256,t_struct(Deposit)5093_storage)": {
+            "label": "mapping(uint256 => struct IAd3StakeManager.Deposit)"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_struct(Deposit)5093_storage": {
+            "label": "struct IAd3StakeManager.Deposit",
+            "members": [
+              {
+                "label": "owner",
+                "type": "t_address"
+              },
+              {
+                "label": "numberOfStakes",
+                "type": "t_uint96"
+              },
+              {
+                "label": "tickLower",
+                "type": "t_int24"
+              },
+              {
+                "label": "tickUpper",
+                "type": "t_int24"
+              }
+            ]
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_uint96": {
+            "label": "uint96"
+          },
+          "t_int24": {
+            "label": "int24"
+          },
+          "t_mapping(t_bytes32,t_mapping(t_uint256,t_struct(Stake)5073_storage))": {
+            "label": "mapping(bytes32 => mapping(uint256 => struct IAd3StakeManager.Stake))"
+          },
+          "t_bytes32": {
+            "label": "bytes32"
+          },
+          "t_mapping(t_uint256,t_struct(Stake)5073_storage)": {
+            "label": "mapping(uint256 => struct IAd3StakeManager.Stake)"
+          },
+          "t_struct(Stake)5073_storage": {
+            "label": "struct IAd3StakeManager.Stake",
+            "members": [
+              {
+                "label": "owner",
+                "type": "t_address"
+              },
+              {
+                "label": "liquidity",
+                "type": "t_uint128"
+              },
+              {
+                "label": "secondsPerLiquidityInsideInitialX128",
+                "type": "t_uint160"
+              },
+              {
+                "label": "secondsPerLiquidityInsideAccruedX128",
+                "type": "t_uint160"
+              }
+            ]
+          },
+          "t_uint128": {
+            "label": "uint128"
+          },
+          "t_uint160": {
+            "label": "uint160"
+          },
+          "t_mapping(t_address,t_mapping(t_address,t_uint256))": {
+            "label": "mapping(address => mapping(address => uint256))"
+          },
+          "t_mapping(t_address,t_uint256)": {
+            "label": "mapping(address => uint256)"
+          },
+          "t_mapping(t_bytes32,t_struct(Incentive)5084_storage)": {
+            "label": "mapping(bytes32 => struct IAd3StakeManager.Incentive)"
+          },
+          "t_struct(Incentive)5084_storage": {
+            "label": "struct IAd3StakeManager.Incentive",
+            "members": [
+              {
+                "label": "totalRewardUnclaimed",
+                "type": "t_uint256"
+              },
+              {
+                "label": "totalSecondsClaimedX128",
+                "type": "t_uint160"
+              },
+              {
+                "label": "numberOfStakes",
+                "type": "t_uint96"
+              },
+              {
+                "label": "minTick",
+                "type": "t_int24"
+              },
+              {
+                "label": "maxTick",
+                "type": "t_int24"
+              }
+            ]
+          },
+          "t_mapping(t_address,t_struct(UintSet)1474_storage)": {
+            "label": "mapping(address => struct EnumerableSet.UintSet)"
+          },
+          "t_struct(UintSet)1474_storage": {
+            "label": "struct EnumerableSet.UintSet",
+            "members": [
+              {
+                "label": "_inner",
+                "type": "t_struct(Set)1088_storage"
+              }
+            ]
+          },
+          "t_struct(Set)1088_storage": {
+            "label": "struct EnumerableSet.Set",
+            "members": [
+              {
+                "label": "_values",
+                "type": "t_array(t_bytes32)dyn_storage"
+              },
+              {
+                "label": "_indexes",
+                "type": "t_mapping(t_bytes32,t_uint256)"
+              }
+            ]
+          },
+          "t_array(t_bytes32)dyn_storage": {
+            "label": "bytes32[]"
+          },
+          "t_mapping(t_bytes32,t_uint256)": {
+            "label": "mapping(bytes32 => uint256)"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_bool": {
+            "label": "bool"
+          }
+        }
+      }
+    }
+  }
+}
