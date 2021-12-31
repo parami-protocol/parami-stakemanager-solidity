@@ -192,7 +192,10 @@ contract Ad3StakeManager is IAd3StakeManager, ReentrancyGuardUpgradeable {
             key.startTime < key.endTime,
             "start time must be before end time"
         );
-
+        require(
+            key.endTime - key.startTime <= 2 * 30 * 24 * 60 * 60,
+            "incentive duration is too long"
+        ); //TODO: remove hardcoded value
         bytes32 incentiveId = IncentiveId.compute(key);
         require(
             incentives[incentiveId].totalRewardUnclaimed == 0,
@@ -304,6 +307,9 @@ contract Ad3StakeManager is IAd3StakeManager, ReentrancyGuardUpgradeable {
         override
         isAuthorizedForToken(tokenId)
     {
+        require(block.timestamp >= key.startTime, "incentive not started");
+        require(block.timestamp <= key.endTime, "incentive has ended");
+
         nonfungiblePositionManager.safeTransferFrom(
             msg.sender,
             address(this),
@@ -487,8 +493,15 @@ contract Ad3StakeManager is IAd3StakeManager, ReentrancyGuardUpgradeable {
         ) = stakes(incentiveId, tokenId);
 
         Incentive storage incentive = incentives[incentiveId];
+        require(
+            incentive.totalRewardUnclaimed > 0,
+            "wrong IncentiveKey, non-existent incentive"
+        );
         Deposit storage deposit = deposits[tokenId];
-
+        require(
+            deposit.owner != address(0),
+            "wrong tokenId, non-existent deposit"
+        );
         (, secondsPerLiquidityInsideX128, ) = key
             .pool
             .snapshotCumulativesInside(deposit.tickLower, deposit.tickUpper);
