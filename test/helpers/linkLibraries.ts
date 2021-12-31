@@ -15,7 +15,7 @@ export const linkLibraries = (
     bytecode: string,
     linkReferences: {
       [fileName: string]: {
-        [contractName: string]: { length: number; start: number }[]
+        [contractName: string]: { length: number; }[]
       }
     }
   },
@@ -26,10 +26,10 @@ export const linkLibraries = (
       if (!libraries.hasOwnProperty(contractName)) {
         throw new Error(`Missing link library name ${contractName}`)
       }
-      //TODO: fix this replace
+      //TODO: it just works for one library link
       const address = utils.getAddress(libraries[contractName]).toLowerCase().slice(2)
       linkReferences[fileName][contractName].forEach(() => {
-        bytecode = bytecode.replace(/__.*__/g,address)
+        bytecode = bytecode.replace(/__.*__/g, address)
       })
     })
   })
