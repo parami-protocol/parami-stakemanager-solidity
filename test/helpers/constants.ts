@@ -1,7 +1,7 @@
 import { BigNumberish, BigNumber, Wallet } from 'ethers';
 import bn from 'bignumber.js';
 import { provider } from "../helpers/provider";
-import {Ad3StakeManager, TestERC20} from '../../typechain';
+import {Ad3StakeManager, TestERC20} from '../../typechain-types';
 import { isArray, isString } from 'lodash';
 
 

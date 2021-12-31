@@ -4,7 +4,7 @@ import { expect } from 'chai';
 import { AccountFixture } from '../helpers/accounts';
 import { createFixtureLoader, provider } from "../helpers/provider";
 import { UniswapFixtureType, UniswapFixture } from "../helpers/fixtures";
-import { Ad3StakeManager } from "../../typechain";
+import { Ad3StakeManager } from "../../typechain-types";
 
 
 describe("unittest/Deployment", () => {

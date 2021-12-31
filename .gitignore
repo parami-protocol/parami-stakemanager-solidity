@@ -1,14 +1,16 @@
-artifacts/
-cache/
-crytic-export/
-node_modules/
+node_modules
+.env
+coverage
+coverage.json
+typechain-types
+
+#Hardhat files
+cache
+artifacts
+typechain-types/
 typechain/
-*.code-workspace
-dist/
-.openzeppelin/
-.openzeppelin/*
-<<<<<<< HEAD
+.DS_Store
+.env.ps1
 yarn-error.log
-=======
-.idea/*
->>>>>>> e7503a5 (ADD: test case for 'return 0 when incentive not exist')
+.vscode/
+soljson-*.js

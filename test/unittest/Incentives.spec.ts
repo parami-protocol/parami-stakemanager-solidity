@@ -24,7 +24,7 @@ import {
     Ad3StakeManager,
     TestIncentiveId,
     TestERC20
-} from "../../typechain";
+} from "../../typechain-types";
 
 type LoadFixtureFunction = ReturnType<typeof createFixtureLoader>;
 let loadFixture: LoadFixtureFunction;
@@ -60,7 +60,7 @@ describe('unittest/Incentive', () => {
         beforeEach('setup', async () => {
             rewardToken = context.rewardToken.address
             pool01 = context.pool01;
-            const {startTime, endTime} = makeTimestamps(await blockTimestamp());
+            const { startTime, endTime } = makeTimestamps(await blockTimestamp());
             incentiveKey = {
                 rewardToken: rewardToken,
                 pool: pool01,
@@ -117,7 +117,7 @@ describe('unittest/Incentive', () => {
         beforeEach('createIncentive', async () => {
             rewardToken = context.rewardToken.address
             pool01 = context.pool01;
-            const {startTime, endTime} = makeTimestamps(await blockTimestamp());
+            const { startTime, endTime } = makeTimestamps(await blockTimestamp());
             incentiveKey = {
                 rewardToken: rewardToken,
                 pool: pool01,
@@ -145,11 +145,11 @@ describe('unittest/Incentive', () => {
                 lpUser1.address)).to.be.revertedWith('only gov');
         });
 
-        it('cannot cancel incentive before endTime', async () => {
+        it('cannot cancel incentive before end time', async () => {
             await expect(context.staker.connect(gov).cancelIncentive(
                 incentiveKey,
                 lpUser1.address
-            )).to.revertedWith('revert cannot cancel incentive before end time');
+            )).to.revertedWith('cannot cancel incentive before end time');
         });
 
         it('goverance cancel incentive after endTime', async () => {

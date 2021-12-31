@@ -19,7 +19,7 @@ export class AccountFixture {
     wallets: Array<Wallet>
     provider: MockProvider
 
-    constructor(wallets, provider) {
+    constructor(wallets: Wallet[], provider: MockProvider) {
         this.wallets = wallets;
         this.provider = provider;
     }
