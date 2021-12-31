@@ -125,18 +125,18 @@ describe('unittest/StakeAndWithdraw', () => {
                 .withArgs(incentiveId, tokenId, liquidity);
         });
 
-        //it('unstake token', async () => {
-            //await timeMachine.setAndMine(incentiveKey.startTime + 1);
-            //await context.staker.connect(lpUser0).depositToken(incentiveKey, tokenId);
-            //expect((await context.staker.deposits(tokenId)).numberOfStakes).to.eq(1);
-            //expect((await context.staker.stakes(incentiveId, tokenId)).secondsPerLiquidityInsideInitialX128).to.gt(0);
+        it('unstake token', async () => {
+            await timeMachine.setAndMine(incentiveKey.startTime + 1);
+            await context.staker.connect(lpUser0).depositToken(incentiveKey, tokenId);
+            expect((await context.staker.deposits(tokenId)).numberOfStakes).to.eq(1);
+            expect((await context.staker.stakes(incentiveId, tokenId)).secondsPerLiquidityInsideInitialX128).to.gt(0);
 
-            //await expect(context.staker.connect(lpUser0).unstakeToken(incentiveKey, tokenId))
-                    //.to.emit(context.staker, 'TokenUnstaked')
-                    //.withArgs(incentiveId, tokenId);
-            //expect((await context.staker.deposits(tokenId)).numberOfStakes).to.eq(0);
-            //expect((await context.staker.stakes(incentiveId, tokenId)).secondsPerLiquidityInsideInitialX128).to.eq(0);
-        //});
+            await expect(context.staker.connect(lpUser0).unstakeToken(incentiveKey, tokenId, lpUser0.address))
+                    .to.emit(context.staker, 'TokenUnstaked')
+                    .withArgs(incentiveId, tokenId);
+            expect((await context.staker.deposits(tokenId)).numberOfStakes).to.eq(0);
+            expect((await context.staker.stakes(incentiveId, tokenId)).secondsPerLiquidityInsideInitialX128).to.eq(0);
+        });
 
         it('check struct with propely values', async () => {
             const liquidity = (await context.nft.positions(tokenId)).liquidity;

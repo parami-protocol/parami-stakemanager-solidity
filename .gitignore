@@ -12,3 +12,5 @@ typechain/
 .DS_Store
 .env.ps1
 yarn-error.log
+.vscode/
+soljson-*.js
