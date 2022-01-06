@@ -188,6 +188,19 @@ describe('unittest/StakeAndWithdraw', () => {
                 ))
                     .revertedWith('incentive duration is too long');
             })
+            it('wrong IncentiveKey, non-existent incentive', async () => {
+                await timeMachine.set(incentiveKey.startTime + 1);
+                await context.staker.connect(lpUser0).depositToken(incentiveKey, tokenId);
+                const wrongIncentive = incentiveKey;
+                wrongIncentive.startTime = incentiveKey.startTime + 1;
+                await expect(context.staker.connect(lpUser0).getAccruedRewardInfo(wrongIncentive, tokenId)).revertedWith('wrong IncentiveKey, non-existent incentive');
+            })
+            it('wrong tokenId, non-existent deposit', async () => {
+                await timeMachine.set(incentiveKey.startTime + 1);
+                await context.staker.connect(lpUser0).depositToken(incentiveKey, tokenId);
+                const wrongTokenId = tokenId + 10000;
+                await expect(context.staker.connect(lpUser0).getAccruedRewardInfo(incentiveKey, wrongTokenId)).revertedWith('wrong tokenId, non-existent deposit');
+            })
         });
     });
 
