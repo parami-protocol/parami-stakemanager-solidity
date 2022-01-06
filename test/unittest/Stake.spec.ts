@@ -242,13 +242,15 @@ describe('unittest/StakeAndWithdraw', () => {
             //await context.staker.connect(lpUser0).unstakeToken(incentiveKey, tokenId);
         });
         it('claim half of reward, and emits RewardClaimed event', async () => {
-            const { reward, secondsInsideX128 } = await context.staker.connect(lpUser0).getRewardAmount(incentiveKey, tokenId)
-            await expect(context.staker.connect(lpUser0).claimReward(incentiveKey, tokenId, recipient, reward.div(2n)))
+            const { reward, secondsInsideX128 } = await context.staker.connect(lpUser0).getAccruedRewardInfo(incentiveKey, tokenId)
+            let rewardInContract = await context.staker.rewards(rewardToken, recipient);
+            const claimedReward = reward.add(rewardInContract).div(2n);
+            await expect(context.staker.connect(lpUser0).claimReward(incentiveKey, tokenId, recipient, claimedReward))
                 .to.emit(context.staker, 'RewardClaimed')
-                .withArgs(recipient, reward.div(2n));
-            const rewardAfterClaim = await context.staker.connect(lpUser0).getRewardAmount(incentiveKey, tokenId);
-            //rewardAfterClaim.reward + reward/2 -reward > 0
-            expect(rewardAfterClaim.reward.add(reward.div(2n)).sub(reward).gte(0)).to.eq(true);
+                .withArgs(recipient, claimedReward);
+            const rewardAfterClaim = await context.staker.connect(lpUser0).getAccruedRewardInfo(incentiveKey, tokenId);
+            rewardInContract = await context.staker.rewards(rewardToken, recipient);
+            expect(rewardAfterClaim.reward.add(rewardInContract).sub(claimedReward).gte(0)).to.eq(true);
         });
         it('transfer reward and check _rewards', async () => {
             const balance = await context.rewardToken.balanceOf(recipient);
