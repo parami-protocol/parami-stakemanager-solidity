@@ -115,7 +115,6 @@ export const uniswapFactoryFixture: Fixture<UniswapFactoryFixtureType> = async (
                     NFTDescriptor: [
                         {
                             length: 20,
-                            start: 0,
                         },
                     ],
                 },
@@ -131,7 +130,9 @@ export const uniswapFactoryFixture: Fixture<UniswapFactoryFixtureType> = async (
             bytecode: linkedBytecode,
             abi: NonfungibleTokenPositionDescriptor.abi,
         },
-        [tokens[0].address,'0x46554e4e594d4f4e455900000000000000000000000000000000000000000000']
+        // constructor(address _WETH9, bytes32 _nativeCurrencyLabelBytes)
+        [tokens[0].address, '0x46554e4e594d4f4e455900000000000000000000000000000000000000000000']
+
     );
     const nftFactory = new ethers.ContractFactory(
         NonfungiblePositionManagerJson.abi,
