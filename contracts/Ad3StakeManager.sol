@@ -168,8 +168,8 @@ contract Ad3StakeManager is IAd3StakeManager, ReentrancyGuardUpgradeable {
     @notice create a new incentive by governor, 
         [require] block.timestamp < key.startTime < key.endTime < (key.startTime + 2 months)
         [require] Incentive with this ID(hash(Key)) does not already exist.
-        [interaction] transfer msg.sender to self
-        [interaction] Sets incentives[key] = Incentive(totalRewardUnclaimed=totalReward, totalSecondsClaimedX128=0, rewardToken=rewardToken)
+        [effect] transfer msg.sender to self
+        [effect] Sets incentives[key] = Incentive(totalRewardUnclaimed=totalReward, totalSecondsClaimedX128=0, rewardToken=rewardToken)
         [interaction] emit IncentiveCreated
     @param key The IncentiveKey struct which defined in IAd3StakeManager
     @param reward The total reward amount of this new incentive
@@ -232,8 +232,8 @@ contract Ad3StakeManager is IAd3StakeManager, ReentrancyGuardUpgradeable {
     @notice cancel a incentive that already exists by governor, the unclaimed reward of this incentive will be returned to the refundee(an address)
         [require] rewardUnclaimed > 0
         [require]  block.timestamp > incentive.endTime, which means the incentive is already expired
-        [interaction] incentives[incentiveId].totalRewardUnclaimed = 0;
-        [interaction] Transfer(key.rewardToken, refundee, rewardUnclaimed);
+        [effect] incentives[incentiveId].totalRewardUnclaimed = 0;
+        [effect] Transfer(key.rewardToken, refundee, rewardUnclaimed);
         [interaction] emit IncentiveCancelled
     @param key The IncentiveKey struct which defined in IAd3StakeManager
     @param refundee The refundee address
@@ -302,6 +302,12 @@ contract Ad3StakeManager is IAd3StakeManager, ReentrancyGuardUpgradeable {
         return this.onERC721Received.selector;
     }
 
+    /** 
+    depositToken make a deposit reqeust.
+    @param key The IncentiveKey struct which defined in IAd3StakeManager
+    @param tokenId The LP nft token id
+    [return] no return
+    */
     function depositToken(IncentiveKey memory key, uint256 tokenId)
         external
         override
@@ -318,6 +324,19 @@ contract Ad3StakeManager is IAd3StakeManager, ReentrancyGuardUpgradeable {
         );
     }
 
+    /** 
+    _stakeToken is the real stake logic entry, intelnal use only.
+    @notice stake a LP token which is from the UniswapV3 pool when the LP nft is received
+        [require] block.timestamp >= key.startTime, which means the incentive is not started
+        [require] block.timestamp <= key.endTime, which means the incentive is not expired
+        [require] incentives[incentiveId].totalRewardUnclaimed != 0, which means the incentive is ready
+        [effect]  update StateVar _stakes with this new stake
+        [interaction] emit TokenStaked(incentiveId, tokenId, liquidity)
+    @param key The IncentiveKey struct which defined in IAd3StakeManager, intelnal use only
+    @param tokenId The LP token id, intelnal use only
+    @param operator The operator address, intelnal use only
+    [return] no return but emit TokenStaked(incentiveId, tokenId, liquidity)
+    */
     function _stakeToken(
         IncentiveKey memory key,
         uint256 tokenId,
@@ -362,7 +381,12 @@ contract Ad3StakeManager is IAd3StakeManager, ReentrancyGuardUpgradeable {
         emit TokenStaked(incentiveId, tokenId, liquidity);
     }
 
-    function _unstakeToken(
+    /** 
+    _cleanReward when unstake a LP token.
+    [interaction] transfer the reward to the operator
+    */
+
+    function _cleanReward(
         Deposit storage deposit,
         Incentive storage incentive,
         uint256 reward,
@@ -398,6 +422,10 @@ contract Ad3StakeManager is IAd3StakeManager, ReentrancyGuardUpgradeable {
         }
     }
 
+    /**
+    [effect] delete the stake info from constract
+    [intraction] transfer the LP token to the operator
+    */
     function _cleanStake(
         bytes32 incentiveId,
         uint256 tokenId,
@@ -415,6 +443,17 @@ contract Ad3StakeManager is IAd3StakeManager, ReentrancyGuardUpgradeable {
         _withdrawToken(tokenId, to);
     }
 
+    /** 
+    unstakeToken is the real unstake logic entry.
+    @notice unstake a LP token and transfer the reward to the LP owner
+        [require] deposit existed, means the key and tokenId are both valid
+        [effect]  see _cleanReward and _cleanStake
+        [interaction] emit TokenUnstaked(incentiveId, tokenId);
+    @param key The IncentiveKey struct which defined in IAd3StakeManager, intelnal use only
+    @param tokenId The LP token id, intelnal use only
+    @param to The target address, intelnal use only
+    [return] no return but emit TokenUnstaked(incentiveId, tokenId);
+    */
     function unstakeToken(
         IncentiveKey memory key,
         uint256 tokenId,
@@ -451,7 +490,7 @@ contract Ad3StakeManager is IAd3StakeManager, ReentrancyGuardUpgradeable {
             );
         }
         {
-            _unstakeToken(
+            _cleanReward(
                 deposit,
                 incentive,
                 reward,
@@ -464,6 +503,7 @@ contract Ad3StakeManager is IAd3StakeManager, ReentrancyGuardUpgradeable {
         emit TokenUnstaked(incentiveId, tokenId);
     }
 
+    //[intraction] transfer the LP token to the operator
     function _withdrawToken(uint256 tokenId, address to) internal {
         require(
             deposits[tokenId].numberOfStakes == 0,
@@ -518,6 +558,20 @@ contract Ad3StakeManager is IAd3StakeManager, ReentrancyGuardUpgradeable {
         reward = deposit.tickUpper < incentive.minTick ? 0 : reward;
     }
 
+    /** 
+    claimReward
+    @notice transfer some reward from a stake to the specified address
+        [require] require(totalReward > 0, "non reward can be claim");
+        [require] require(amountRequested > 0 && amountRequested <= totalReward);
+        [effect]  rewards[rewardToken][msg.sender] be updated
+        [interaction] transfer the reward to specified address
+        [interaction] emit RewardClaimed(to, amountRequested);
+    @param key The IncentiveKey struct which defined in IAd3StakeManager
+    @param tokenId The LP token id
+    @param to The target address
+    @param amountRequested The amount of reward to be claimed
+    [return] no return but emit RewardClaimed(to, amountRequested);
+    */
     function claimReward(
         IncentiveKey memory key,
         uint256 tokenId,
