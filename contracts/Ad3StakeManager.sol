@@ -611,4 +611,24 @@ contract Ad3StakeManager is IAd3StakeManager, ReentrancyGuardUpgradeable {
 
         emit RewardClaimed(to, amountRequested);
     }
+
+    function getRewardAmount(IncentiveKey memory key, uint256 tokenId)
+        public
+        view
+        returns (
+            uint256 reward,
+            uint160 secondsInsideX128,
+            uint160 secondsPerLiquidityInsideX128
+        )
+    {
+        address rewardToken = key.rewardToken;
+        uint256 totalReward = rewards[rewardToken][msg.sender];
+        (
+            uint256 reward,
+            uint160 secondsInsideX128,
+            uint160 secondsPerLiquidityInsideX128
+        ) = getAccruedRewardInfo(key, tokenId);
+        totalReward = totalReward.add(reward);
+        return (totalReward, secondsInsideX128, secondsPerLiquidityInsideX128);
+    }
 }
